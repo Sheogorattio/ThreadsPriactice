@@ -5,6 +5,8 @@ INT nErrors = 4;
 
 Threads* Threads::ptr = NULL;
 
+int OriginPriority = 0;
+
 Threads::Threads() {
     ptr = this;
 }
@@ -24,6 +26,8 @@ BOOL Threads::Cls_OnInit(HWND hwnd, HWND hwndFocus, LPARAM lp)
     hCheckTimer = GetDlgItem(hwnd, IDC_CHECK1);
     hEdit = GetDlgItem(hwnd, IDC_EDIT1);
     hThreadTimer = CreateThread(NULL, 0, ThreadTimer, hwnd, CREATE_SUSPENDED, NULL );
+    OriginPriority = GetThreadPriority(hThreadTimer);
+    SetThreadPriority(hThreadTimer, ABOVE_NORMAL_PRIORITY_CLASS);
     return TRUE;
 }
 
@@ -42,6 +46,7 @@ void Threads::Cls_onCommand(HWND hwnd, int id, HWND hwndCtrl, UINT codeNoyify)
         nErrors = 4;
     }
     if (id == IDCANCEL) {
+        SetThreadPriority(hThreadTimer, OriginPriority);
         EndDialog(hwnd, 0);
     }
     if (id == IDC_CHECK1) {
@@ -54,6 +59,7 @@ void Threads::Cls_onCommand(HWND hwnd, int id, HWND hwndCtrl, UINT codeNoyify)
 }
 
 void Threads::Cls_OnClose(HWND hwnd) {
+    SetThreadPriority(hThreadTimer, OriginPriority);
     KillTimer(hwnd, 1);
     EndDialog(hwnd, 0);
 }
